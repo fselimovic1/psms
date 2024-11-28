@@ -16,7 +16,7 @@ settings["analysis"] = "powerflow";
 settings["staticdata"] = "case9.m";
 
 # input file - dynamic data, empty string if static analysis only
-settings["dyndata"] = "";
+settings["dyndata"] = "case9d_gencls.dyr";
 
 # suffix for XML file name, file name format: staticdatafilename_analysis_suffix
 settings["xmlsuffix"] = "test";

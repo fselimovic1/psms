@@ -9,22 +9,31 @@ import numpy as np
 
 from common.message import psms_message
 
-
+# STATIC
 BUS_DATA_SIZE = 13;
 GEN_DATA_SIZE = 10;
 BRANCH_DATA_SIZE = 13;
+STATIC_PATH = "data\\static\\";
 
-def readmfile(data):
+# DYNAMIC
+SG_DATA_SIZE = 16;
+GENCLS_DATA_SIZE = 5;
+GENTRA_DATA_SIZE = 12;
+AVR_DATA_SIZE = 16;
+TG_DATA_SIZE = 16;
+DYN_PATH = "data\\dynamic\\";
 
-    path = "data\\static\\";
-    if data[-2:] == ".m":
-        filename = path + data;
+
+def readmfile(sfile):
+
+    if sfile[-2:] == ".m":
+        filename = STATIC_PATH + sfile;
     else:
-        filename = path + data + ".m"
+        filename = STATIC_PATH + sfile + ".m"
 
     # check if file exist
     if not os.path.isfile(filename):
-        psms_message(1, f"The file'{data}' do not exists or it is not in a folder '{path}'.");
+        psms_message(1, f"The file '{sfile}' do not exists or it is not in the folder '{STATIC_PATH}'.");
         exit();
 
     # define internal power system data format
@@ -145,4 +154,73 @@ def readmfile(data):
 
 
 def readdyrfile(settings, ppc):
-    pass
+    
+    # Dynamic models currently supported
+    models = [ "GENCLS", "GENTRA", "IEEET1", "TGOV1" ];
+
+    dynfile = settings["dyndata"];
+
+    if dynfile[-4:] == ".dyr":
+        filename = DYN_PATH + dynfile;
+    else:
+        filename = DYN_PATH + dynfile + ".dyr";
+
+    # check if file exist
+    if not os.path.isfile(filename):
+        psms_message(1, f"The file '{dynfile}' do not exists or it is not in the folder '{DYN_PATH}'.");
+        exit();
+
+    # define internal power system data format
+    ppc["sg"] = np.empty((0, SG_DATA_SIZE));
+    ppc["avr"] = np.empty((0, AVR_DATA_SIZE));
+    ppc["tg"] = np.empty((0, TG_DATA_SIZE));
+
+    # Open the .dyr file in read mode
+    with open(filename, 'r') as file:
+        # Read and process each line
+        for line in file:
+            sline = line.strip();
+
+            # Ignore comments and blank lines
+            if sline == "" or sline[:2] == "//":
+                continue;
+
+            data = sline.split(", ");   # Columns have to be separated with ', '
+            modelname = data[1].replace("'", "");
+            if modelname not in models:
+                psms_message(1, f"Model termed {modelname} is not supported. Please read user manual to check" 
+                             +" which dynamic models are supported.");
+                exit();
+
+            # SYMCHRONOUS GENERATORS
+            # GENCLS
+            if modelname == "GENCLS":
+                if len(data) != GENCLS_DATA_SIZE:
+                    psms_message(1, f"Model {modelname} requires {GENCLS_DATA_SIZE} parameters but {len(data)}"
+                                 + " have been provided.");
+                    exit();
+            
+                row_gencls = np.zeros((SG_DATA_SIZE));
+                data = np.fromstring(sline.replace(data[1] + ",", ""), sep=",");
+                
+                # Model type
+                row_gencls[1] = 1;
+                # Bus ID
+                row_gencls[0] = data[0];
+                # D
+                row_gencls[2] = data[3];
+                # M = 2 * H/ws
+                row_gencls[3] = 2 * data[2];
+
+                ppc["sg"] = np.vstack([ppc["sg"], row_gencls]);
+
+
+
+    return ppc;
+
+
+
+
+
+
+
