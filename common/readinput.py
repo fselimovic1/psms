@@ -130,24 +130,35 @@ def readmfile(sfile):
                     array = array[:BRANCH_DATA_SIZE];
                 ppc["branch"] = np.vstack([ppc["branch"], array]);
 
-        # basic data check
-        if not ppc["bus"].shape[0]:
-            psms_message(1, "Matrix mpc.bus is not entered or data format is incorrect. The M file must be written in accordance"
-                          + " with the software manual.\n")
-            exit()
-        if not ppc["gen"].shape[0]:
-            psms_message(1, "Matrix mpc.gen is not entered or data format is incorrect. The M file must be written in accordance"
-                          + " with the software manual.\n")
-            exit()
-        if not ppc["branch"].shape[0]:
-            psms_message(1, "Matrix mpc.branch is not entered or data format is incorrect. The M file must be written in accordance"
-                          + " with the software manual.\n")
-            exit()
-        if not int(ppc["baseMVA"]):
-            psms_message(1, "baseMVA not entered or equal to zero. The M file must be written in accordance"
-                          + " with the software manual.\n")
-            exit()
+    # Set nominal frequency
+    ppc["fn"] = 60;
+    
+    # Number of buses
+    ppc["nb"] = ppc["bus"].shape[0];
+    # Number of generators
+    ppc["ng"] = ppc["gen"].shape[0];
+    # Number of branches
+    ppc["nbr"] = ppc["branch"].shape[0];
 
+    ppc["ndyn"] = 0;
+
+    # Basic data check
+    if not ppc["nb"]:
+        psms_message(1, "Matrix mpc.bus is not entered or data format is incorrect. The M file must be written in accordance"
+                        + " with the software manual.\n")
+        exit()
+    if not ppc["ng"]:
+        psms_message(1, "Matrix mpc.gen is not entered or data format is incorrect. The M file must be written in accordance"
+                        + " with the software manual.\n")
+        exit()
+    if not ppc["nbr"]:
+        psms_message(1, "Matrix mpc.branch is not entered or data format is incorrect. The M file must be written in accordance"
+                        + " with the software manual.\n")
+        exit()
+    if not int(ppc["baseMVA"]):
+        psms_message(1, "baseMVA not entered or equal to zero. The M file must be written in accordance"
+                        + " with the software manual.\n")
+        exit()
                     
     return ppc;
 
@@ -213,8 +224,44 @@ def readdyrfile(settings, ppc):
                 row_gencls[3] = 2 * data[2];
 
                 ppc["sg"] = np.vstack([ppc["sg"], row_gencls]);
+            
+            elif modelname == "GENTRA":
+                if len(data) != GENTRA_DATA_SIZE:
+                    psms_message(1, f"Model {modelname} requires {GENTRA_DATA_SIZE} parameters but {len(data)}"
+                                 + " have been provided.");
+                    exit();
+                
+                row_gentra = np.zeros((SG_DATA_SIZE));
+                data = np.fromstring(sline.replace(data[1] + ",", ""), sep=",");
+                
+                # Model type
+                row_gentra[1] = 2;
+                # Bus ID
+                row_gentra[0] = data[0];
+                # T1d0
+                row_gentra[12] = data[2];
+                # D
+                row_gentra[2] = data[4];
+                # M = 2 * H/ws
+                row_gentra[3] = 2 * data[3];
+                # xd
+                row_gentra[6] = data[5];
+                # xq
+                row_gentra[7] = data[6];
+                # xd'
+                row_gentra[8] = data[7];
+
+                ppc["sg"] = np.vstack([ppc["sg"], row_gentra]);
 
 
+    # Number of SG devices
+    ppc["nsg"] = ppc["sg"].shape[0];
+    # Number of AVR devices
+    ppc["navr"] = ppc["avr"].shape[0];
+    # Number of TG devices
+    ppc["ntg"] = ppc["tg"].shape[0];
+    # Total number of dynamic devices
+    ppc["ndyn"] = ppc["nsg"] + ppc["navr"] + ppc["ntg"]; 
 
     return ppc;
 

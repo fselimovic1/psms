@@ -36,3 +36,14 @@ def ybus(ppc):
     Y[bus[:,0].astype(int) - 1, bus[:,0].astype(int) - 1] += (bus[:,4] + 1j * bus[:,5])
 
     return Y
+
+
+def conn_matrix(ppc):
+
+    cmat = np.empty((ppc["nb"], ppc["nb"]), dtype=bool);
+    cmat.fill(False);
+    for i in range(ppc["nbr"]):
+        cmat[int(ppc["branch"][i, 0] - 1),  int(ppc["branch"][i, 1] - 1)] = True;
+        cmat[int(ppc["branch"][i, 1] - 1),  int(ppc["branch"][i, 0] - 1)] = True;
+
+    return cmat;
