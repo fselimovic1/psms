@@ -67,7 +67,7 @@ def dyn_xml(settings, ppc):
     """
 
     # MODEL SOLVER
-    model = ET.Element("Model", attrib={"type": "DAE", "domain": "real", "method": "Simulatanous", "eps": str(EPS), "name": xml_filename});
+    model = ET.Element("Model", attrib={"type": "DAE", "domain": "real", "method": "Trapezoidal", "eps": str(EPS), "name": xml_filename});
     
     # VARIABLES
     model.append(ET.Comment("Variables for DAE problem"));

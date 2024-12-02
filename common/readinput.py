@@ -31,9 +31,9 @@ def readmfile(sfile):
     else:
         filename = STATIC_PATH + sfile + ".m"
 
-    # check if file exist
+    # Check if file exist
     if not os.path.isfile(filename):
-        psms_message(1, f"The file '{sfile}' do not exists or it is not in the folder '{STATIC_PATH}'.");
+        psms_message(1, f"The file '{sfile}' does not exist or it is not in the folder '{STATIC_PATH}'.");
         exit();
 
     # define internal power system data format
@@ -178,7 +178,7 @@ def readdyrfile(settings, ppc):
 
     # check if file exist
     if not os.path.isfile(filename):
-        psms_message(1, f"The file '{dynfile}' do not exists or it is not in the folder '{DYN_PATH}'.");
+        psms_message(1, f"The file '{dynfile}' does not exist or it is not in the folder '{DYN_PATH}'.");
         exit();
 
     # define internal power system data format

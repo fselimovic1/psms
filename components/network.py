@@ -115,7 +115,7 @@ def network(settings, ppc, dict4xml, comments = {}):
                     pEqStr = pEqStr + "+ V" + str(i + 1) + "*V" + str(j + 1) + "*(G" + str(i + 1) + "_" + str(j + 1) + \
                             "*cos(theta" + str(i + 1) + "- theta" + str(j + 1) + ") + B" + str(i + 1) + "_" + str(j + 1) + "*sin(theta" + \
                             str(i + 1) + " - theta" + str(j + 1) + "))";
-            dict4xml["nleqs"] = np.append(dict4xml["nleqs"], {"fx": pEqStr + "- (busPgenEq" + str(i + 1) + ") + pl" + str(i + 1) + "_0"});
+            dict4xml["nleqs"] = np.append(dict4xml["nleqs"], {"fx": pEqStr + " - (busPgenEq" + str(i + 1) + ") + pl" + str(i + 1) + "_0"});
             countNLEqs = countNLEqs  + 1;
             # Reactive power
             qEqStr = "-V" + str(i + 1) + "^2*B" + str(i + 1) + "_" + str(i + 1); 
@@ -124,7 +124,7 @@ def network(settings, ppc, dict4xml, comments = {}):
                     qEqStr = qEqStr + "+ V" + str(i + 1) + "*V" + str(j + 1) + "*(G" + str(i + 1) + "_" + str(j + 1) + \
                         "*sin(theta" + str(i + 1) + "- theta" + str(j + 1) + ") - B" + str(i + 1) + "_" + str(j + 1) + "*cos(theta" + \
                         str(i + 1) + " - theta" + str(j + 1) + "))";
-            dict4xml["nleqs"] = np.append(dict4xml["nleqs"], {"fx": qEqStr + "- (busQgenEq" + str(i + 1) + ") + ql" + str(i + 1) + "_0"});                
+            dict4xml["nleqs"] = np.append(dict4xml["nleqs"], {"fx": qEqStr + " - (busQgenEq" + str(i + 1) + ") + ql" + str(i + 1) + "_0"});                
             countNLEqs = countNLEqs + 1;
         # PQ BUS - LOAD
         else:
@@ -135,7 +135,7 @@ def network(settings, ppc, dict4xml, comments = {}):
                     pEqStr = pEqStr + "+ V" + str(i + 1) + "*V" + str(j + 1) + "*(G" + str(i + 1) + "_" + str(j + 1) + \
                     "*cos(theta" + str(i + 1) + "- theta" + str(j + 1) + ") + B" + str(i + 1) + "_" + str(j + 1) + "*sin(theta" + \
                     str(i + 1) + " - theta" + str(j + 1) + "))";
-            pEqStr = pEqStr + " + pl" + str(i + 1) + "_0 - pg" + str(j + 1) + "_0"; 
+            pEqStr = pEqStr + " + pl" + str(i + 1) + "_0 - pg" + str(i+ 1) + "_0"; 
             dict4xml["nleqs"] = np.append(dict4xml["nleqs"], {"fx": pEqStr});
             countNLEqs = countNLEqs + 1;
             # Reactive power
@@ -145,7 +145,7 @@ def network(settings, ppc, dict4xml, comments = {}):
                     qEqStr = qEqStr + "+ V" + str(i + 1) + "*V" + str(j + 1) + "*(G" + str(i + 1) + "_" + str(j + 1) + \
                         "*sin(theta" + str(i + 1) + "- theta" + str(j + 1) + ") - B" + str(i + 1) + "_" + str(j + 1) + "*cos(theta" + \
                         str(i + 1) + " - theta" + str(j + 1) + "))";
-            qEqStr = qEqStr + " + ql" + str(i + 1) + "_0 - qg" + str(j + 1) + "_0";
+            qEqStr = qEqStr + " + ql" + str(i + 1) + "_0 - qg" + str(i + 1) + "_0";
             dict4xml["nleqs"] = np.append(dict4xml["nleqs"], {"fx": qEqStr});
             countNLEqs = countNLEqs + 1;
     comments["nleqs"][0] = countNLEqs;

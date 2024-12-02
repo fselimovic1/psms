@@ -5,14 +5,20 @@
 
 import os
 
+from modelSolver.solve import solve
 
-model_filename = "case9_DYN_test.xml"
 
-tstep = 1e-3;
-tf = 5;
+# simulation settings / settings as global variable?
+settings = {"solver": "powerSystemModelSolver (psms) v1.0"}
 
-# Run modelSolver
-os.chdir("modelSolver");
-msCommand = "modelSolver DAE real psModel\\" + model_filename + " ..\\" + "OUT_" + model_filename[:-4] + ".txt" + " 0 " + str(tstep) + " " + str(tf);
-os.system(msCommand);
-os.chdir("..")
+# analysis type: "powerflow" / "dynamics"
+settings["model_filename"] = "case9_DYN_test.xml";
+
+# Choose variables to plot
+settings["plot"] = {
+    "V": [],
+    "w": [], 
+};
+
+solve(settings);
+

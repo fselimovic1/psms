@@ -9,7 +9,7 @@ from routines.generate import generatexml
 # simulation settings / settings as global variable?
 settings = {"solver": "powerSystemModelSolver (psms) v1.0"}
 
-# analysis type
+# analysis type: "powerflow" / "dynamics"
 settings["analysis"] = "dynamics";
 
 # input files - static data
