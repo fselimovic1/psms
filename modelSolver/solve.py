@@ -44,5 +44,5 @@ def solve(settings):
     results = readout(RESULTS_FILE);
 
     # Plot selected data
-    plot(results, settings["plot"]);
+    plot(results, settings);
 

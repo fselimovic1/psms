@@ -543,5 +543,10 @@
         <Eq fx="e1q3 - V3 * cos(theta3 -  delta3) - x1d3 * id3 = 0"/>
     </NLEqs>
     <!--Postprocessing: disturbance/perturbance definition-->
-    <PostProc/>
+    <!--Postprocessing: disturbance/perturbance definition-->
+    <PostProc>
+        <Eq cond="t &gt; 0.5">
+            <Then fx="pl7_0 = 1.0575"/>
+        </Eq>
+    </PostProc>
 </Model>
