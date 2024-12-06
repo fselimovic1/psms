@@ -4,7 +4,6 @@
 """
 
 import numpy as np
-import math
 
 
 def gentra(no, settings, ppc, dict4xml, comments, ngeqs):

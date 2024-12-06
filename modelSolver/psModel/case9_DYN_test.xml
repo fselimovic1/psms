@@ -286,7 +286,7 @@
         <Param name="M3" val="6.02"/>
         <Param name="xd3" val="1.3125"/>
         <Param name="xq3" val="1.2578"/>
-        <Param name="x1d3" val="0.0"/>
+        <Param name="x1d3" val="1813.0"/>
         <Param name="Vf3" val="1"/>
         <Param name="Pm3" val="1"/>
     </Params>
@@ -543,10 +543,9 @@
         <Eq fx="e1q3 - V3 * cos(theta3 -  delta3) - x1d3 * id3 = 0"/>
     </NLEqs>
     <!--Postprocessing: disturbance/perturbance definition-->
-    <!--Postprocessing: disturbance/perturbance definition-->
     <PostProc>
-        <Eq cond="t &gt; 0.5">
-            <Then fx="pl7_0 = 1.0575"/>
+        <Eq cond="t &gt; 1">
+            <Then fx="pl9_0 = 1.0925"/>
         </Eq>
     </PostProc>
 </Model>

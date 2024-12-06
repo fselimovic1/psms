@@ -152,15 +152,21 @@ def network(settings, ppc, dict4xml, comments = {}):
    
     # POST-PROCCESSING
     #### EVENT SETUP ####
-    if settings["analysis"] == "dynsim" and settings["event"]["etype"] == "loadOn":
-        loadpower = settings["event"]["power"];
-        totalload = sum(ppc["bus"][:, 2])
-        load_toadd = loadpower * totalload/100
-        loadbus = np.where(ppc["bus"][:, 2] != 0)[0]
-        bus_toadd = loadbus[random.randint(0, len(loadbus) - 1)];
-        new_load = ppc["bus"][bus_toadd, 2] + load_toadd;
-        dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["etime_s"]), "fx": "pl" + \
-                                                          str(bus_toadd + 1) + "_0 = " + str(new_load)});
+    if settings["analysis"] == "dynamics":
+        if settings["event"]["etype"] == "loadOn" or settings["event"]["etype"] == "loadOff":
+            loadpower = settings["event"]["power"];
+            totalload = sum(ppc["bus"][:, 2])
+            load_toadd = loadpower * totalload/100
+            loadbus = np.where(ppc["bus"][:, 2] != 0)[0]
+            bus_toadd = loadbus[random.randint(0, len(loadbus) - 1)];
+            # Add or substract
+            if settings["event"]["etype"] == "loadOn":
+                new_load = ppc["bus"][bus_toadd, 2] + load_toadd;
+            else:
+                new_load = ppc["bus"][bus_toadd, 2] - load_toadd;
+            
+            dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["ts"]),\
+                                                               "fx": "pl" + str(bus_toadd + 1) + "_0 = " + str(new_load)});
     
     ################################################## INITIALIZATION ##################################################
     if settings["analysis"] == "dynamics":

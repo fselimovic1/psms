@@ -12,8 +12,7 @@ from common.plot import plot
 MS_PATH = "modelSolver\\modelSolver.exe";
 PSMS_MODEL_PATH = "modelSolver\\psModel\\";
 RESULTS_FILE = "OUT.txt";
-T_STEP = 1e-3;
-TF = 10;
+
 
 def solve(settings):
 
@@ -37,11 +36,15 @@ def solve(settings):
         exit();
 
     # Run modelSolver
-    msCommand = MS_PATH + " " + solver + " real " + model_file + " " + RESULTS_FILE +  " " + " 0 " + str(T_STEP) + " " + str(TF);
+    msCommand = MS_PATH + " " + solver + " real " + model_file + " " + RESULTS_FILE +  " " + " 0 " + \
+                str(settings["dT"]) + " " + str(settings["tf"]);
     os.system(msCommand);
 
     # Read simulation data
     results = readout(RESULTS_FILE);
+
+    # Success message
+    psms_message(10, f"The simulation was successfully completed without any issues!")
 
     # Plot selected data
     plot(results, settings);

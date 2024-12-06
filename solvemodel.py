@@ -3,15 +3,19 @@
 """
 """
 
-import os
-
 from modelSolver.solve import solve
 
-# simulation settings / settings as global variable?
+# Simulation settings / settings as global variable?
 settings = {"solver": "powerSystemModelSolver (psms) v1.0"}
 
-# analysis type: "powerflow" / "dynamics"
+# Power system model XML filename
 settings["model_filename"] = "case9_DYN_test.xml";
+
+# Simulation time step (only for dynamics)
+settings["dT"] = 1e-3;
+
+# Simulation time/time final
+settings["tf"] = 5;
 
 # Choose variables to plot
 settings["plot"] = {

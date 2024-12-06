@@ -55,6 +55,8 @@ def dyn_xml(settings, ppc):
     
     # SYNCHRONOUS GENERATOR XML configuration
     sg(settings, ppc, dict4xml, comments);
+
+
     
     """
     # TURBINE GOVERNOR XML configuration

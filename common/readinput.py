@@ -4,7 +4,7 @@
 """
 
 import os
-
+import math
 import numpy as np
 
 from common.message import psms_message
@@ -19,10 +19,24 @@ STATIC_PATH = "data\\static\\";
 SG_DATA_SIZE = 16;
 GENCLS_DATA_SIZE = 5;
 GENTRA_DATA_SIZE = 12;
-AVR_DATA_SIZE = 16;
+AVR_DATA_SIZE = 13;
+IEEET1_DATA_SIZE = 17;
 TG_DATA_SIZE = 16;
 DYN_PATH = "data\\dynamic\\";
 
+
+def satfun_coeff(points):
+
+    E1 = points[0];
+    S1 = points[1];
+    E2 = points[2];
+    S2 = points[3];
+
+    # Coefficient for exponential saturation function
+    Bx = (math.log(S1/S2))/(E1 - E2);
+    Ax = S1/(math.exp(Bx * E1));
+
+    return [ Ax, Bx ];
 
 def readmfile(sfile):
 
@@ -189,14 +203,25 @@ def readdyrfile(settings, ppc):
     # Open the .dyr file in read mode
     with open(filename, 'r') as file:
         # Read and process each line
+        data = "";
+        emptydata = False;
         for line in file:
             sline = line.strip();
 
             # Ignore comments and blank lines
-            if sline == "" or sline[:2] == "//":
+            if sline == "" or sline[:2] == "//" :
+                if bool(data):
+                    psms_message(1, "Incorrect data format detected. The M file must be written in accordance"
+                                    + " with the software manual.");
+                    exit();
                 continue;
+            if sline[-1:] != "/":
+                data = data +  sline + " ";
+                continue
 
-            data = sline.split(", ");   # Columns have to be separated with ', '
+            data = data + sline[:-1];
+
+            data = data.split();   # Columns have to be separated with ', '
             modelname = data[1].replace("'", "");
             if modelname not in models:
                 psms_message(1, f"Model termed {modelname} is not supported. Please read user manual to check" 
@@ -212,7 +237,10 @@ def readdyrfile(settings, ppc):
                     exit();
             
                 row_gencls = np.zeros((SG_DATA_SIZE));
-                data = np.fromstring(sline.replace(data[1] + ",", ""), sep=",");
+
+                # Exclude model name
+                data = data[:1] + data[2:]
+                data = np.array([float(x) for x in data]);
                 
                 # Model type
                 row_gencls[1] = 1;
@@ -232,8 +260,10 @@ def readdyrfile(settings, ppc):
                     exit();
                 
                 row_gentra = np.zeros((SG_DATA_SIZE));
-                data = np.fromstring(sline.replace(data[1] + ",", ""), sep=",");
-                
+                # Exclude model name
+                data = data[:1] + data[2:]
+                data = np.array([float(x) for x in data]);
+
                 # Model type
                 row_gentra[1] = 2;
                 # Bus ID
@@ -252,6 +282,48 @@ def readdyrfile(settings, ppc):
                 row_gentra[8] = data[7];
 
                 ppc["sg"] = np.vstack([ppc["sg"], row_gentra]);
+            elif modelname == "IEEET1":
+                if len(data) != IEEET1_DATA_SIZE:
+                    psms_message(1, f"Model {modelname} requires {IEEET1_DATA_SIZE} parameters but {len(data)}"
+                                 + " have been provided.");
+                    exit();
+
+                row_ieeet1 = np.zeros((AVR_DATA_SIZE));
+
+                # Exclude model name
+                data = data[:1] + data[2:]
+                data = np.array([float(x) for x in data]);
+
+                # Model type
+                row_ieeet1[1] = 2;
+                # GEN ID
+                row_ieeet1[0] = data[0];
+                # vr_max
+                row_ieeet1[2] = data[5];
+                # vr_min
+                row_ieeet1[3] = data[6];
+                # Ka
+                row_ieeet1[4] = data[3];
+                # Ke
+                row_ieeet1[5] = data[7];
+                # Kf
+                row_ieeet1[6] = data[9];
+                # Ta
+                row_ieeet1[7] = data[4];
+                # Tf
+                row_ieeet1[8] = data[10];
+                # Te
+                row_ieeet1[9] = data[8];
+                # Tr
+                row_ieeet1[10] = data[2];
+                
+                # Ae & Be
+                [ row_ieeet1[11], row_ieeet1[12]] = satfun_coeff(data[12:])
+
+                # Add to AVR data
+                ppc["avr"] = np.vstack([ppc["avr"], row_ieeet1]);
+            # Empty data variable
+            data = ""
 
 
     # Number of SG devices
