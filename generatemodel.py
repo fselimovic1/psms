@@ -19,7 +19,7 @@ settings["staticdata"] = "case9.m";
 settings["dyndata"] = "case9d_gentra_ieeet1";
 
 # suffix for XML file name, file name format: staticdatafilename_analysis_suffix
-settings["xmlsuffix"] = "test";
+settings["xmlsuffix"] = "V1";
 
 # EVENT settings
 # 1 Load on: {"etype": "loadOn", "power": 5} 
@@ -27,7 +27,7 @@ settings["xmlsuffix"] = "test";
 # 3 Line removal: {"etype": "lrem", "noLine": 7 } -> to be implemented
 settings["event"] = { 
         "etype": "loadOff", 
-        "power": 5,
+        "power": 8,
         "ts": 1,
         "te": -1,
         }

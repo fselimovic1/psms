@@ -295,7 +295,7 @@ def readdyrfile(settings, ppc):
                 data = np.array([float(x) for x in data]);
 
                 # Model type
-                row_ieeet1[1] = 2;
+                row_ieeet1[1] = 1;
                 # GEN ID
                 row_ieeet1[0] = data[0];
                 # vr_max

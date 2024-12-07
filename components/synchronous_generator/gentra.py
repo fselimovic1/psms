@@ -10,6 +10,12 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     
     ibus = int(ppc["sg"][no, 0]);
 
+    # Check if AVR is connected to SG
+    avr_connected = "avr" in ppc and any(no + 1 == avrGen for avrGen in ppc["avr"][:, 0]);
+
+    # Check if TG is connected to SG
+    tg_connected = "tg" in ppc and any(no + 1 == tgGen for tgGen in ppc["tg"][:, 0]);
+
     # VARIABLES
     countVars = 0;
     varname = [ "delta", "w", "e1q", "id", "iq" ]
@@ -41,11 +47,11 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     countParams = countParams + 1;
 
     # Vf - optional
-    if not ("avr" in ppc and any(ppc["sg"][i, 0] == avrGen for avrGen in ppc["avr"][:, 0])):
+    if not avr_connected:
         dict4xml["params"] = np.append(dict4xml["params"], {"name": "Vf" + str(ibus), "val": str(1)});
         countParams = countParams + 1;
     # Pm - optional
-    if not ("tg" in ppc and any(ppc["sg"][i, 0] == tgGen for tgGen in ppc["tg"][:, 0])):
+    if not tg_connected:
         dict4xml["params"] = np.append(dict4xml["params"], {"name": "Pm" + str(ibus), "val": str(1)});
     countParams = countParams + 1;
     #
@@ -62,7 +68,7 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     dict4xml["odes"] = np.append(dict4xml["odes"], {"fx": dEq});
     countOdes = countOdes + 1;
     # w
-    if "tg" in ppc and any(no + 1 == tgGen for tgGen in ppc["tg"][:, 0]):
+    if tg_connected:
         mechPowStr = "tm" + str(ibus);
     else:
         mechPowStr = "Pm" + str(ibus); 
@@ -70,7 +76,7 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     dict4xml["odes"] = np.append(dict4xml["odes"], {"fx": wEq});
     countOdes = countOdes + 1;
     # E1q
-    if "avr" in ppc and any(no + 1 == avrGen for avrGen in ppc["avr"][:, 0]):
+    if avr_connected:
         excDCStr = "vf" + str(ibus);
     else:
         excDCStr = "Vf" + str(ibus); 
@@ -148,6 +154,12 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     countInitParams = countInitParams + 1;
     dict4xml["init"]["params"] = np.append(dict4xml["init"]["params"], {"name": "vq" + str(ibus) + "_0", "val": str(0)});
     countInitParams = countInitParams + 1;
+    # Vf_0
+    dict4xml["init"]["params"] = np.append(dict4xml["init"]["params"], {"name": "Vf" + str(ibus) + "_0", "val": str(0)});
+    countInitParams = countInitParams + 1;
+    # Pm_0
+    dict4xml["init"]["params"] = np.append(dict4xml["init"]["params"], {"name": "Pm" + str(ibus) + "_0", "val": str(0)});
+    countInitParams = countInitParams + 1;
     #
     comments["init"]["params"][no + 1] = comments["init"]["params"][no] + countInitParams;
 
@@ -218,14 +230,21 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "base.e1q" + str(ibus) + "= e1q" + str(ibus) + "_0"});
     countInitPproc = countInitPproc + 1;
     # Vf
-    dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "base.Vf" + str(ibus) + " = e1q" + str(ibus)
+    dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "Vf" + str(ibus) + "_0 = e1q" + str(ibus)
         + "_0 + (xd" + str(ibus) + " - x1d" + str(ibus) + ") * id" + str(ibus) + "_0"});
     countInitPproc = countInitPproc + 1;
+    if not avr_connected:
+        dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "base.Vf" + str(ibus) + "= Vf" + str(ibus) + "_0"});
+        countInitPproc = countInitPproc + 1;
+
     # Pm
-    dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "base.Pm" + str(ibus) + " = e1q" + str(ibus)
+    dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "Pm" + str(ibus) + "_0 = e1q" + str(ibus)
                                             + "_0 * iq" + str(ibus) + "_0 + (xq" + str(ibus) + " - x1d" + str(ibus) 
                                             + ") * id" + str(ibus) + "_0 * iq" + str(ibus) + "_0"});
     countInitPproc = countInitPproc + 1;
+    if not tg_connected:
+        dict4xml["init"]["pproc"] = np.append(dict4xml["init"]["pproc"], {"fx": "base.Pm" + str(ibus) + "= Pm" + str(ibus) + "_0"});
+        countInitPproc = countInitPproc + 1;
     # Comments
     comments["init"]["pproc"][no + 1] = comments["init"]["pproc"][no] + countInitPproc;
     

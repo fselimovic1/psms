@@ -10,6 +10,7 @@ import xml.dom.minidom as minidom
 from common.message import psms_message
 from components.network import network
 from components.synchronous_generator.sg import sg
+from components.automatic_voltage_regulator.avr import avr
 
 
 EPS = 1E-6;
@@ -56,16 +57,13 @@ def dyn_xml(settings, ppc):
     # SYNCHRONOUS GENERATOR XML configuration
     sg(settings, ppc, dict4xml, comments);
 
-
+    # AUTOMATIC VOLTAGE REGULATOR XML configuration
+    avr(settings, ppc, dict4xml, comments);
     
     """
     # TURBINE GOVERNOR XML configuration
     if "tg" in ppc:
         turbine_governor(settings, ppc, dict4xml, comments);
-
-    # AUTOMATIC VOLTAGE REGULATOR XML configuration
-    if "avr" in ppc:
-        automatic_voltage_regulator(settings, ppc, dict4xml, comments);
     """
 
     # MODEL SOLVER
@@ -83,9 +81,9 @@ def dyn_xml(settings, ppc):
             if ppc["nsg"] and no >= 1 and no <= ppc["nsg"]:
                 vars.append(ET.Comment(f"Synchrnous generator {int(no)} (Bus {int(ppc["sg"][int(no - 1), 0])}) variables"))    
             elif ppc["ntg"] and no > ppc["nsg"] and no <= ppc["nsg"] + ppc["ntg"]:
-                vars.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Bus {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) variables"))
+                vars.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Generator {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) variables"))
             elif ppc["navr"] and no > ppc["nsg"] + ppc["ntg"] and no <= ppc["nsg"] + ppc["ntg"] + ppc["navr"]:
-                vars.append(ET.Comment(f"Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Bus {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) variables"))
+                vars.append(ET.Comment(f"Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Generator {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) variables"))
         ET.SubElement(vars, "Var", attrib= dict4xml["vars"][i]);
 
     # PARAMETERS
@@ -100,9 +98,9 @@ def dyn_xml(settings, ppc):
             if ppc["nsg"] and no >= 1 and no <= ppc["nsg"]:
                 params.append(ET.Comment(f"Synchrnous generator {int(no)} (Bus {int(ppc["sg"][int(no - 1), 0])}) parameters")) 
             elif ppc["ntg"] and no > ppc["nsg"] and no <= ppc["nsg"] + ppc["ntg"]:
-                params.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Bus {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) parameters"))
+                params.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Generator {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) parameters"))
             elif ppc["navr"] and no > ppc["nsg"] + ppc["ntg"] and no <= ppc["nsg"] + ppc["ntg"] + ppc["navr"]:
-                params.append(ET.Comment(f"Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Bus {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) parameters"))
+                params.append(ET.Comment(f"Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Generator {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) parameters"))
         ET.SubElement(params, "Param", attrib= dict4xml["params"][i]);
     
     ################################################  INITIALIZATION ###################################################
@@ -129,9 +127,9 @@ def dyn_xml(settings, ppc):
             if no >= 1 and no <= ppc["nsg"]:
                 iparams.append(ET.Comment(f"Synchrnous generator {int(no)} (Bus {int(ppc["sg"][int(no - 1), 0])}) additional parameters")) 
             elif no > ppc["nsg"] and no <= ppc["nsg"] + ppc["ntg"]:
-                iparams.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Bus {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) additional parameters"))
+                iparams.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Generator {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) additional parameters"))
             elif no > ppc["nsg"] + ppc["ntg"] and no <= ppc["nsg"] + ppc["ntg"] + ppc["navr"]:
-                iparams.append(ET.Comment(f"Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Bus {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) additional parameters"))
+                iparams.append(ET.Comment(f"Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Generator {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) additional parameters"))
         ET.SubElement(iparams, "Param", attrib= dict4xml["init"]["params"][i]);
     
     # I_NLeqs
@@ -152,9 +150,9 @@ def dyn_xml(settings, ppc):
             if ppc["nsg"] and no >= 1 and no <= ppc["nsg"]:
                 ipproc.append(ET.Comment(f"Initalization of Synchrnous generator {int(no)} (Bus {int(ppc["sg"][int(no - 1), 0])}) variables")) 
             elif ppc["ntg"] and no > ppc["nsg"] and no <= ppc["nsg"] + ppc["ntg"]:
-                ipproc.append(ET.Comment(f"Initalization of Turbine governor {int(no - ppc["nsg"])} (Bus {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) variables"))
+                ipproc.append(ET.Comment(f"Initalization of Turbine governor {int(no - ppc["nsg"])} (Generator {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) variables"))
             elif ppc["navr"] and no > ppc["nsg"] + ppc["ntg"] and no <= ppc["nsg"] + ppc["ntg"] + ppc["navr"]:
-                ipproc.append(ET.Comment(f"Initalization of  Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Bus {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) variables"))
+                ipproc.append(ET.Comment(f"Initalization of  Automatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Generator {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) variables"))
         ET.SubElement(ipproc, "Eq", attrib= dict4xml["init"]["pproc"][i]);
     ####################################################################################################################
 
@@ -170,9 +168,9 @@ def dyn_xml(settings, ppc):
             if ppc["nsg"] and no >= 2 and no <= ppc["nsg"]:
                 odes.append(ET.Comment(f"Synchrnous generator {int(no)} (Bus {int(ppc["sg"][int(no - 1), 0])}) ordinary differential equations"))
             elif ppc["ntg"] and no >= ppc["nsg"] + 1 and no <= ppc["nsg"] + ppc["ntg"]:
-                odes.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Bus {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) ordinary differential equations"))
+                odes.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Generator {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) ordinary differential equations"))
             elif ppc["navr"] and no >= ppc["nsg"] + ppc["ntg"] + 1 and no <= ppc["nsg"] + ppc["ntg"] + ppc["navr"]:
-                odes.append(ET.Comment(f"Autoatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Bus {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) ordinary differential equations"))
+                odes.append(ET.Comment(f"Autoatic voltage regulator {int(no - ppc["nsg"] - ppc["ntg"])} (Generator {int(ppc["avr"][int(no - ppc["nsg"] - ppc["ntg"] - 1), 0])}) ordinary differential equations"))
         ET.SubElement(odes, "Eq", attrib= dict4xml["odes"][i]);
     
     # NLEqs
@@ -187,7 +185,7 @@ def dyn_xml(settings, ppc):
             if ppc["nsg"] and no >= 1 and no <= ppc["nsg"]:
                 nleqs.append(ET.Comment(f"Synchrnous generator {int(no)} (Bus {int(ppc["sg"][int(no - 1), 0])}) algebraic equations")) 
             elif ppc["ntg"] and no > ppc["nsg"] and no <= ppc["nsg"] + ppc["ntg"]:
-                nleqs.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Bus {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) algebraic equations"))
+                nleqs.append(ET.Comment(f"Turbine governor {int(no - ppc["nsg"])} (Generator {int(ppc["tg"][int(no - ppc["nsg"] - 1), 0])}) algebraic equations"))
         ET.SubElement(nleqs, "Eq", attrib= dict4xml["nleqs"][i]);
     
     # PProc
