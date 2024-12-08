@@ -21,10 +21,12 @@ GENCLS_DATA_SIZE = 5;
 GENTRA_DATA_SIZE = 12;
 AVR_DATA_SIZE = 13;
 IEEET1_DATA_SIZE = 17;
-TG_DATA_SIZE = 16;
+TG_DATA_SIZE = 8;
+TGOV1_DATA_SIZE = 9;
 DYN_PATH = "data\\dynamic\\";
 
 
+# Saturation function AVR
 def satfun_coeff(points):
 
     E1 = points[0];
@@ -204,7 +206,6 @@ def readdyrfile(settings, ppc):
     with open(filename, 'r') as file:
         # Read and process each line
         data = "";
-        emptydata = False;
         for line in file:
             sline = line.strip();
 
@@ -282,6 +283,7 @@ def readdyrfile(settings, ppc):
                 row_gentra[8] = data[7];
 
                 ppc["sg"] = np.vstack([ppc["sg"], row_gentra]);
+            # AUTOMATIC VOLTAGE REGULATORS
             elif modelname == "IEEET1":
                 if len(data) != IEEET1_DATA_SIZE:
                     psms_message(1, f"Model {modelname} requires {IEEET1_DATA_SIZE} parameters but {len(data)}"
@@ -322,6 +324,40 @@ def readdyrfile(settings, ppc):
 
                 # Add to AVR data
                 ppc["avr"] = np.vstack([ppc["avr"], row_ieeet1]);
+            # TURBINE GOVERNORS
+            elif modelname == "TGOV1":
+                if len(data) != TGOV1_DATA_SIZE:
+                    psms_message(1, f"Model {modelname} requires {TGOV1_DATA_SIZE} parameters but {len(data)}"
+                                 + " have been provided.");
+                    exit();
+
+                row_tgov1 = np.zeros((TG_DATA_SIZE));
+
+                # Exclude model name
+                data = data[:1] + data[2:]
+                data = np.array([float(x) for x in data]);
+
+                # Model type
+                row_tgov1[1] = 1;
+                # GEN ID
+                row_tgov1[0] = data[0];
+                # Rd
+                row_tgov1[2] = data[2];
+                # T1
+                row_tgov1[3] = data[3];
+                # vg_max
+                row_tgov1[4] = data[4];
+                # vg_min
+                row_tgov1[5] = data[5];
+                # T2
+                row_tgov1[6] = data[6];
+                # T3
+                row_tgov1[7] = data[7];
+
+                # Add to AVR data
+                ppc["tg"] = np.vstack([ppc["tg"], row_tgov1]);
+
+
             # Empty data variable
             data = ""
 

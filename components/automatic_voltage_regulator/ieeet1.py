@@ -30,7 +30,7 @@ def ieeet1(no, settings, ppc, dict4xml, comments):
     # PARAMETERS
     countParams = 0;
     # Vref
-    dict4xml["params"] = np.append(dict4xml["params"], {"name": "Vref" + str(igen), "val": str(1), "out": "true"});
+    dict4xml["params"] = np.append(dict4xml["params"], {"name": "Vref" + str(igen), "val": str(1)});
     countParams = countParams + 1;
     # Aef
     dict4xml["params"] = np.append(dict4xml["params"], {"name": "Aef" + str(igen), "val": str(ppc["avr"][no, 11])});

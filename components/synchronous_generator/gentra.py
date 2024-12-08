@@ -53,7 +53,7 @@ def gentra(no, settings, ppc, dict4xml, comments, ngeqs):
     # Pm - optional
     if not tg_connected:
         dict4xml["params"] = np.append(dict4xml["params"], {"name": "Pm" + str(ibus), "val": str(1)});
-    countParams = countParams + 1;
+        countParams = countParams + 1;
     #
     comments["params"][no + 1] = comments["params"][no] + countParams;
 

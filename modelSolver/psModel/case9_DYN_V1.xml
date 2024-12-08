@@ -39,21 +39,15 @@
         <Var name="e1q3" val="1"/>
         <Var name="id3" val="1"/>
         <Var name="iq3" val="1"/>
-        <!--Automatic voltage regulator 1 (Generator 1) variables-->
-        <Var name="vrm1"/>
-        <Var name="vrf1"/>
-        <Var name="vrr1"/>
-        <Var name="vf1"/>
-        <!--Automatic voltage regulator 2 (Generator 2) variables-->
-        <Var name="vrm2"/>
-        <Var name="vrf2"/>
-        <Var name="vrr2"/>
-        <Var name="vf2"/>
-        <!--Automatic voltage regulator 3 (Generator 3) variables-->
-        <Var name="vrm3"/>
-        <Var name="vrf3"/>
-        <Var name="vrr3"/>
-        <Var name="vf3"/>
+        <!--Turbine governor 1 (Generator 1) variables-->
+        <Var name="xg1"/>
+        <Var name="tm1"/>
+        <!--Turbine governor 2 (Generator 2) variables-->
+        <Var name="xg2"/>
+        <Var name="tm2"/>
+        <!--Turbine governor 3 (Generator 3) variables-->
+        <Var name="xg3"/>
+        <Var name="tm3"/>
     </Vars>
     <!--Parameters for DAE problem-->
     <Params>
@@ -284,7 +278,7 @@
         <Param name="xd1" val="0.146"/>
         <Param name="xq1" val="0.0969"/>
         <Param name="x1d1" val="0.0608"/>
-        <Param name="Pm1" val="1"/>
+        <Param name="Vf1" val="1"/>
         <!--Synchrnous generator 2 (Bus 2) parameters-->
         <Param name="T1d2" val="6.0"/>
         <Param name="D2" val="2.5"/>
@@ -292,7 +286,7 @@
         <Param name="xd2" val="0.8958"/>
         <Param name="xq2" val="0.8645"/>
         <Param name="x1d2" val="0.1198"/>
-        <Param name="Pm2" val="1"/>
+        <Param name="Vf2" val="1"/>
         <!--Synchrnous generator 3 (Bus 3) parameters-->
         <Param name="T1d3" val="5.89"/>
         <Param name="D3" val="1.8"/>
@@ -300,46 +294,28 @@
         <Param name="xd3" val="1.3125"/>
         <Param name="xq3" val="1.2578"/>
         <Param name="x1d3" val="0.1813"/>
-        <Param name="Pm3" val="1"/>
-        <!--Automatic voltage regulator 1 (Generator 1) parameters-->
-        <Param name="Vref1" val="1" out="true"/>
-        <Param name="Aef1" val="0.0039008306051577647"/>
-        <Param name="Bef1" val="1.554950914561948"/>
-        <Param name="Ka1" val="20.0"/>
-        <Param name="Kef1" val="1.0"/>
-        <Param name="Kf1" val="0.063"/>
-        <Param name="Ta1" val="0.2"/>
-        <Param name="Tef1" val="0.314"/>
-        <Param name="Tf1" val="0.35"/>
-        <Param name="Tr1" val="0.001"/>
-        <Param name="vrmax1" val="3.0"/>
-        <Param name="vrmin1" val="-3.0"/>
-        <!--Automatic voltage regulator 2 (Generator 2) parameters-->
-        <Param name="Vref2" val="1" out="true"/>
-        <Param name="Aef2" val="0.0039008306051577647"/>
-        <Param name="Bef2" val="1.554950914561948"/>
-        <Param name="Ka2" val="20.0"/>
-        <Param name="Kef2" val="1.0"/>
-        <Param name="Kf2" val="0.063"/>
-        <Param name="Ta2" val="0.2"/>
-        <Param name="Tef2" val="0.314"/>
-        <Param name="Tf2" val="0.35"/>
-        <Param name="Tr2" val="0.001"/>
-        <Param name="vrmax2" val="3.0"/>
-        <Param name="vrmin2" val="-3.0"/>
-        <!--Automatic voltage regulator 3 (Generator 3) parameters-->
-        <Param name="Vref3" val="1" out="true"/>
-        <Param name="Aef3" val="0.0039008306051577647"/>
-        <Param name="Bef3" val="1.554950914561948"/>
-        <Param name="Ka3" val="20.0"/>
-        <Param name="Kef3" val="1.0"/>
-        <Param name="Kf3" val="0.063"/>
-        <Param name="Ta3" val="0.2"/>
-        <Param name="Tef3" val="0.314"/>
-        <Param name="Tf3" val="0.35"/>
-        <Param name="Tr3" val="0.001"/>
-        <Param name="vrmax3" val="3.0"/>
-        <Param name="vrmin3" val="-3.0"/>
+        <Param name="Vf3" val="1"/>
+        <!--Turbine governor 1 (Generator 1) parameters-->
+        <Param name="Porder1" val="1"/>
+        <Param name="wref1" val="1"/>
+        <Param name="Rd1" val="0.05"/>
+        <Param name="T1_1" val="0.2"/>
+        <Param name="T2_1" val="5.0"/>
+        <Param name="T3_1" val="10.0"/>
+        <!--Turbine governor 2 (Generator 2) parameters-->
+        <Param name="Porder2" val="1"/>
+        <Param name="wref2" val="1"/>
+        <Param name="Rd2" val="0.05"/>
+        <Param name="T1_2" val="0.2"/>
+        <Param name="T2_2" val="5.0"/>
+        <Param name="T3_2" val="10.0"/>
+        <!--Turbine governor 3 (Generator 3) parameters-->
+        <Param name="Porder3" val="1"/>
+        <Param name="wref3" val="1"/>
+        <Param name="Rd3" val="0.05"/>
+        <Param name="T1_3" val="0.2"/>
+        <Param name="T2_3" val="5.0"/>
+        <Param name="T3_3" val="10.0"/>
     </Params>
     <!--Power flow: variables initialization-->
     <Init>
@@ -509,8 +485,8 @@
                 <Eq fx="e1q1_0 = V1* cos(theta1 - delta1_0) + x1d1 * id1_0"/>
                 <Eq fx="base.e1q1= e1q1_0"/>
                 <Eq fx="Vf1_0 = e1q1_0 + (xd1 - x1d1) * id1_0"/>
+                <Eq fx="base.Vf1= Vf1_0"/>
                 <Eq fx="Pm1_0 = e1q1_0 * iq1_0 + (xq1 - x1d1) * id1_0 * iq1_0"/>
-                <Eq fx="base.Pm1= Pm1_0"/>
                 <!--Initalization of Synchrnous generator 2 (Bus 2) variables-->
                 <Eq fx="base.w2 = ws"/>
                 <Eq fx="Ig2r = I2r + (1/V2) * (pl2_0 * cos(theta2) + ql2_0 * sin(theta2))"/>
@@ -530,8 +506,8 @@
                 <Eq fx="e1q2_0 = V2* cos(theta2 - delta2_0) + x1d2 * id2_0"/>
                 <Eq fx="base.e1q2= e1q2_0"/>
                 <Eq fx="Vf2_0 = e1q2_0 + (xd2 - x1d2) * id2_0"/>
+                <Eq fx="base.Vf2= Vf2_0"/>
                 <Eq fx="Pm2_0 = e1q2_0 * iq2_0 + (xq2 - x1d2) * id2_0 * iq2_0"/>
-                <Eq fx="base.Pm2= Pm2_0"/>
                 <!--Initalization of Synchrnous generator 3 (Bus 3) variables-->
                 <Eq fx="base.w3 = ws"/>
                 <Eq fx="Ig3r = I3r + (1/V3) * (pl3_0 * cos(theta3) + ql3_0 * sin(theta3))"/>
@@ -551,26 +527,20 @@
                 <Eq fx="e1q3_0 = V3* cos(theta3 - delta3_0) + x1d3 * id3_0"/>
                 <Eq fx="base.e1q3= e1q3_0"/>
                 <Eq fx="Vf3_0 = e1q3_0 + (xd3 - x1d3) * id3_0"/>
+                <Eq fx="base.Vf3= Vf3_0"/>
                 <Eq fx="Pm3_0 = e1q3_0 * iq3_0 + (xq3 - x1d3) * id3_0 * iq3_0"/>
-                <Eq fx="base.Pm3= Pm3_0"/>
-                <!--Initalization of  Automatic voltage regulator 1 (Generator 1) variables-->
-                <Eq fx="base.vf1 = Vf1_0"/>
-                <Eq fx="base.vrm1 = V1"/>
-                <Eq fx="base.vrf1 =  -Kf1 * Vf1_0 /Tf1"/>
-                <Eq fx="base.vrr1 = Kef1 * Vf1_0 + Aef1 * exp(Bef1 * Vf1_0) * Vf1_0"/>
-                <Eq fx="base.Vref1 = V1 + (1/Ka1) * (Kef1 * Vf1_0 + Aef1 * exp(Bef1 * Vf1_0) * Vf1_0)"/>
-                <!--Initalization of  Automatic voltage regulator 2 (Generator 2) variables-->
-                <Eq fx="base.vf2 = Vf2_0"/>
-                <Eq fx="base.vrm2 = V2"/>
-                <Eq fx="base.vrf2 =  -Kf2 * Vf2_0 /Tf2"/>
-                <Eq fx="base.vrr2 = Kef2 * Vf2_0 + Aef2 * exp(Bef2 * Vf2_0) * Vf2_0"/>
-                <Eq fx="base.Vref2 = V2 + (1/Ka2) * (Kef2 * Vf2_0 + Aef2 * exp(Bef2 * Vf2_0) * Vf2_0)"/>
-                <!--Initalization of  Automatic voltage regulator 3 (Generator 3) variables-->
-                <Eq fx="base.vf3 = Vf3_0"/>
-                <Eq fx="base.vrm3 = V3"/>
-                <Eq fx="base.vrf3 =  -Kf3 * Vf3_0 /Tf3"/>
-                <Eq fx="base.vrr3 = Kef3 * Vf3_0 + Aef3 * exp(Bef3 * Vf3_0) * Vf3_0"/>
-                <Eq fx="base.Vref3 = V3 + (1/Ka3) * (Kef3 * Vf3_0 + Aef3 * exp(Bef3 * Vf3_0) * Vf3_0)"/>
+                <!--Initalization of Turbine governor 1 (Generator 1) variables-->
+                <Eq fx="base.Porder1 = Pm1_0"/>
+                <Eq fx="base.xg1 = Pm1_0"/>
+                <Eq fx="base.tm1 = Pm1_0"/>
+                <!--Initalization of Turbine governor 2 (Generator 2) variables-->
+                <Eq fx="base.Porder2 = Pm2_0"/>
+                <Eq fx="base.xg2 = Pm2_0"/>
+                <Eq fx="base.tm2 = Pm2_0"/>
+                <!--Initalization of Turbine governor 3 (Generator 3) variables-->
+                <Eq fx="base.Porder3 = Pm3_0"/>
+                <Eq fx="base.xg3 = Pm3_0"/>
+                <Eq fx="base.tm3 = Pm3_0"/>
             </PostProc>
         </Model>
     </Init>
@@ -578,31 +548,25 @@
     <ODEqs>
         <!--Synchrnous generator 1 (Bus 1) ordinary differential equations-->
         <Eq fx="delta1' = wn * (w1 - ws)"/>
-        <Eq fx="w1' = (1/M1) * (Pm1  - (e1q1 * iq1 + (xq1 - x1d1) * id1 * iq1) - D1* (w1 - ws))"/>
-        <Eq fx="e1q1' = (1/T1d1) * (-e1q1 - (xd1 - x1d1) * id1 + vf1)"/>
+        <Eq fx="w1' = (1/M1) * (tm1  - (e1q1 * iq1 + (xq1 - x1d1) * id1 * iq1) - D1* (w1 - ws))"/>
+        <Eq fx="e1q1' = (1/T1d1) * (-e1q1 - (xd1 - x1d1) * id1 + Vf1)"/>
         <!--Synchrnous generator 2 (Bus 2) ordinary differential equations-->
         <Eq fx="delta2' = wn * (w2 - ws)"/>
-        <Eq fx="w2' = (1/M2) * (Pm2  - (e1q2 * iq2 + (xq2 - x1d2) * id2 * iq2) - D2* (w2 - ws))"/>
-        <Eq fx="e1q2' = (1/T1d2) * (-e1q2 - (xd2 - x1d2) * id2 + vf2)"/>
+        <Eq fx="w2' = (1/M2) * (tm2  - (e1q2 * iq2 + (xq2 - x1d2) * id2 * iq2) - D2* (w2 - ws))"/>
+        <Eq fx="e1q2' = (1/T1d2) * (-e1q2 - (xd2 - x1d2) * id2 + Vf2)"/>
         <!--Synchrnous generator 3 (Bus 3) ordinary differential equations-->
         <Eq fx="delta3' = wn * (w3 - ws)"/>
-        <Eq fx="w3' = (1/M3) * (Pm3  - (e1q3 * iq3 + (xq3 - x1d3) * id3 * iq3) - D3* (w3 - ws))"/>
-        <Eq fx="e1q3' = (1/T1d3) * (-e1q3 - (xd3 - x1d3) * id3 + vf3)"/>
-        <!--Autoatic voltage regulator 1 (Generator 1) ordinary differential equations-->
-        <Eq fx="vrm1' = (1/Tr1) * (V1 - vrm1)"/>
-        <Eq fx="vrf1' = (-1/Tf1) * ((Kf1/Tf1) * vf1 + vrf1)"/>
-        <Eq fx="vrr1' = (1/Ta1) * (Ka1 * (Vref1 - vrm1 - vrf1 - (Kf1/Tf1) * vf1) - vrr1)"/>
-        <Eq fx="vf1' = (-1/Tef1) * (vf1 * (Kef1 + Aef1 * exp(Bef1 * vf1)) - vrr1)"/>
-        <!--Autoatic voltage regulator 2 (Generator 2) ordinary differential equations-->
-        <Eq fx="vrm2' = (1/Tr2) * (V2 - vrm2)"/>
-        <Eq fx="vrf2' = (-1/Tf2) * ((Kf2/Tf2) * vf2 + vrf2)"/>
-        <Eq fx="vrr2' = (1/Ta2) * (Ka2 * (Vref2 - vrm2 - vrf2 - (Kf2/Tf2) * vf2) - vrr2)"/>
-        <Eq fx="vf2' = (-1/Tef2) * (vf2 * (Kef2 + Aef2 * exp(Bef2 * vf2)) - vrr2)"/>
-        <!--Autoatic voltage regulator 3 (Generator 3) ordinary differential equations-->
-        <Eq fx="vrm3' = (1/Tr3) * (V3 - vrm3)"/>
-        <Eq fx="vrf3' = (-1/Tf3) * ((Kf3/Tf3) * vf3 + vrf3)"/>
-        <Eq fx="vrr3' = (1/Ta3) * (Ka3 * (Vref3 - vrm3 - vrf3 - (Kf3/Tf3) * vf3) - vrr3)"/>
-        <Eq fx="vf3' = (-1/Tef3) * (vf3 * (Kef3 + Aef3 * exp(Bef3 * vf3)) - vrr3)"/>
+        <Eq fx="w3' = (1/M3) * (tm3  - (e1q3 * iq3 + (xq3 - x1d3) * id3 * iq3) - D3* (w3 - ws))"/>
+        <Eq fx="e1q3' = (1/T1d3) * (-e1q3 - (xd3 - x1d3) * id3 + Vf3)"/>
+        <!--Turbine governor 1 (Generator 1) ordinary differential equations-->
+        <Eq fx="xg1' = (1/T1_1) * (Porder1 + (wref1 - w1)/Rd1 - xg1)"/>
+        <Eq fx="tm1' = (1/T3_1) * (T2_1 * ((1/T1_1) * (Porder1 + (wref1 - w1)/Rd1 - xg1)) + xg1 - tm1)"/>
+        <!--Turbine governor 2 (Generator 2) ordinary differential equations-->
+        <Eq fx="xg2' = (1/T1_2) * (Porder2 + (wref2 - w2)/Rd2 - xg2)"/>
+        <Eq fx="tm2' = (1/T3_2) * (T2_2 * ((1/T1_2) * (Porder2 + (wref2 - w2)/Rd2 - xg2)) + xg2 - tm2)"/>
+        <!--Turbine governor 3 (Generator 3) ordinary differential equations-->
+        <Eq fx="xg3' = (1/T1_3) * (Porder3 + (wref3 - w3)/Rd3 - xg3)"/>
+        <Eq fx="tm3' = (1/T3_3) * (T2_3 * ((1/T1_3) * (Porder3 + (wref3 - w3)/Rd3 - xg3)) + xg3 - tm3)"/>
     </ODEqs>
     <!--Nonlinear algebraic equations for DAE problem-->
     <NLEqs>
@@ -637,8 +601,8 @@
     </NLEqs>
     <!--Postprocessing: disturbance/perturbance definition-->
     <PostProc>
-        <Eq cond="t &gt; 1">
-            <Then fx="pl7_0 = 0.748"/>
+        <Eq cond="t &gt; 0.5">
+            <Then fx="pl9_0 = 1.4075"/>
         </Eq>
     </PostProc>
 </Model>
