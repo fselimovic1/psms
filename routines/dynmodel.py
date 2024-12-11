@@ -14,7 +14,7 @@ from components.automatic_voltage_regulator.avr import avr
 from components.turbine_governor.tg import tg
 
 
-EPS = 1E-6;
+EPS = 1E-4;
 
 
 def dyn_xml(settings, ppc):

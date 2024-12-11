@@ -25,11 +25,12 @@ settings["xmlsuffix"] = "V1";
 # 1 Load on: {"etype": "loadOn", "power": 5} 
 # 2 Load off: {"etype": "loadOff", "power": 5} 
 # 3 Line removal: {"etype": "lrem", "noLine": 7 } -> to be implemented
-settings["event"] = { 
-        "etype": "loadOn", 
-        "power": 5,
-        "ts": 0.5,
-        "te": -1,
+# ts - time instant when event starts
+# te - time instant when event ends
+settings["event"] = {
+        "etype": "lrem",
+        "noLine": 5,
+        "ts": 1,
         }
 
 # input data processing 

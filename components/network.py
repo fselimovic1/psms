@@ -10,6 +10,7 @@ import numpy as np
 from common.ybus import ybus
 from common.ybus import conn_matrix
 
+EPS = 1E-6;
 
 def network(settings, ppc, dict4xml, comments = {}):
     
@@ -42,9 +43,11 @@ def network(settings, ppc, dict4xml, comments = {}):
         # Magnitude
         idx = np.where(ppc["gen"][:, 0] == i + 1)[0];
         if not len(idx):
-            dict4xml["params"] = np.append(dict4xml["params"], {"name": "V" + str(i + 1) + "_0", "val": str(ppc["bus"][i, 7]) });
+            dict4xml["params"] = np.append(dict4xml["params"], {"name": "V" + str(i + 1) + "_0",\
+                                                                 "val": str(ppc["bus"][i, 7]) });
         else:
-            dict4xml["params"] = np.append(dict4xml["params"], {"name": "V" + str(i + 1) + "_0", "val": str(ppc["gen"][idx[0], 5])});
+            dict4xml["params"] = np.append(dict4xml["params"], {"name": "V" + str(i + 1) + "_0",\
+                                                                 "val": str(ppc["gen"][idx[0], 5])});
         countParams = countParams + 1
         # Angle
         dict4xml["params"] = np.append(dict4xml["params"], {"name": "theta" + str(i + 1) + "_0", "val": str(ppc["bus"][i, 8])});
@@ -53,9 +56,11 @@ def network(settings, ppc, dict4xml, comments = {}):
     for i in range(ppc["nb"]):
         for j in range(ppc["nb"]):
             # G
-            dict4xml["params"] = np.append(dict4xml["params"], {"name": "G" + str(i + 1) + "_" + str(j + 1), "val": str(np.real(Y[i, j])) });
+            dict4xml["params"] = np.append(dict4xml["params"], {"name": "G" + str(i + 1) + "_" + str(j + 1),\
+                                                                 "val": str(np.real(Y[i, j])) });
             # B
-            dict4xml["params"] = np.append(dict4xml["params"], {"name": "B" + str(i + 1) + "_" + str(j + 1), "val": str(np.imag(Y[i, j])) });
+            dict4xml["params"] = np.append(dict4xml["params"], {"name": "B" + str(i + 1) + "_" + str(j + 1),\
+             "val": str(np.imag(Y[i, j])) });
             countParams = countParams + 2;
     # Load powers
     for i in range(ppc["nb"]):
@@ -153,10 +158,11 @@ def network(settings, ppc, dict4xml, comments = {}):
     # POST-PROCCESSING
     #### EVENT SETUP ####
     if settings["analysis"] == "dynamics":
+        # Load connection/disconnection
         if settings["event"]["etype"] == "loadOn" or settings["event"]["etype"] == "loadOff":
             loadpower = settings["event"]["power"];
-            totalload = sum(ppc["bus"][:, 2])
-            load_toadd = loadpower * totalload/100
+            totalload = sum(ppc["bus"][:, 2]);
+            load_toadd = loadpower * totalload/100;
             loadbus = np.where(ppc["bus"][:, 2] != 0)[0]
             bus_toadd = loadbus[random.randint(0, len(loadbus) - 1)];
             # Add or substract
@@ -167,6 +173,41 @@ def network(settings, ppc, dict4xml, comments = {}):
             
             dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["ts"]),\
                                                                "fx": "pl" + str(bus_toadd + 1) + "_0 = " + str(new_load)});
+            # If EVENT has a defined end time
+            if "te" in settings["event"] and settings["event"]["te"] != -1:
+                dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["te"]),\
+                                              "fx": "pl" + str(bus_toadd + 1) + "_0 = " + str(ppc["bus"][bus_toadd, 2])});
+        # Line switching
+        elif settings["event"]["etype"] == "lrem":
+            # Compute new Y bus without selected line
+            noline = int(settings["event"]["noLine"]);
+            nppc = ppc;
+            nppc["branch"] = np.delete(ppc["branch"], noline - 1, axis=0);
+            nY = ybus(nppc);
+            #If EVENT has a defined end time
+            defined_end = False;
+            if "te" in settings["event"] and settings["event"]["te"] != -1:
+                defined_end = True;
+            # Write to XML dict
+            for i in range(ppc["nb"]):
+                for j in range(ppc["nb"]):
+                    if np.abs(np.real(nY[i, j]) - np.real(Y[i, j])) > EPS: 
+                        # nG
+                        dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["ts"]),\
+                                              "fx": "G" + str(i + 1) + "_" + str(j + 1) +  " = " + str(np.real(nY[i, j]))});
+                        if defined_end:
+                            # G
+                            dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["te"]),\
+                                              "fx": "G" + str(i + 1) + "_" + str(j + 1) +  " = " + str(np.real(Y[i, j]))});
+                    if np.abs(np.imag(nY[i, j]) - np.imag(Y[i, j])) > EPS: 
+                        # nB
+                        dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["ts"]),\
+                                              "fx": "B" + str(i + 1) + "_" + str(j + 1) +  " = " + str(np.imag(nY[i, j]))});
+                        if defined_end:
+                            # B
+                            dict4xml["pproc"] = np.append(dict4xml["pproc"], {"cond": "t > " + str(settings["event"]["te"]),\
+                                              "fx": "B" + str(i + 1) + "_" + str(j + 1) +  " = " + str(np.imag(Y[i, j]))});
+
     
     ################################################## INITIALIZATION ##################################################
     if settings["analysis"] == "dynamics":

@@ -15,7 +15,7 @@ settings["model_filename"] = "case9_DYN_V1.xml";
 settings["dT"] = 1e-3;
 
 # Simulation time/time final
-settings["tf"] = 10;
+settings["tf"] = 5;
 
 # Choose variables to plot
 settings["plot"] = {
